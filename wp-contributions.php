@@ -36,24 +36,24 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 			// Activation/Deactivation Hooks
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-
+			
 		}
 
 		/**
 		 * Include our plugin dependencies.
 		 */
 		public function includes() {
-			if ( $this->meets_requirements() ) {
-			}
+
+			require_once( $this-> directory_path . 'inc/class-wds-wp-contributions-plugins.php' );
+			require_once( $this-> directory_path . 'inc/class-wds-wp-contributions-themes.php' );
+
 		}
 
 		/**
 		 * Activation hook for the plugin.
 		 */
 		public function activate() {
-			// If requirements are available, run our activation functions
-			if ( $this->meets_requirements() ) {
-			}
+
 		}
 
 		/**
