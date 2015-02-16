@@ -31,12 +31,16 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 			add_action( 'init', array( $this, 'includes' ) );
 
 			// Load Textdomain
-			load_plugin_textdomain( 'wp_contributions', false, dirname( $this->basename ) . '/languages' );
+			load_plugin_textdomain( 'wp-contributions', false, dirname( $this->basename ) . '/languages' );
 
 			// Activation/Deactivation Hooks
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-			
+
+			// Add settings to User Profile Pages.
+			add_action( 'show_user_profile', array( $this, 'user_profile' ) );
+			add_action( 'edit_user_profile', array( $this, 'user_profile' ) );
+
 		}
 
 		/**
@@ -60,6 +64,24 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 		 * Deactivation hook for the plugin.
 		 */
 		public function deactivate() {
+
+		}
+
+		/**
+		 * Outputs the per user settings on user profile pages.
+		 *
+		 * @param object $user The WP_User object of the user being displayed.
+		 */
+		function user_profile( $user ) {
+
+			if ( ! current_user_can( 'edit_users' ) ) {
+				return;
+			}
+
+			?>
+			<h3 id="wp-contributions"><?php esc_html_e( 'WP Contributions Settings', 'wp-contributions'); ?></h3>
+
+			<?php
 
 		}
 
