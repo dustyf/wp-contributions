@@ -11,6 +11,6 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 		function __construct() {
 
 		}
-		
+
 	}
 }
