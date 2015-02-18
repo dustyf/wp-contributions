@@ -28,7 +28,7 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 			$this->directory_url  = plugins_url( dirname( $this->basename ) );
 
 			// Include any required files
-			add_action( 'init', array( $this, 'includes' ) );
+			$this->includes();
 
 			// Load Textdomain
 			load_plugin_textdomain( 'wp-contributions', false, dirname( $this->basename ) . '/languages' );
@@ -45,6 +45,9 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 			add_action( 'personal_options_update', array( $this, 'update_user' ) );
 			add_action( 'edit_user_profile_update', array( $this, 'update_user' ) );
 
+			// Register Widgets
+			add_action( 'widgets_init', array( $this, 'register_widgets' ) );
+
 			if ( isset( $_GET['debug'] ) && $_GET['debug'] == true ) {
 				add_action( 'admin_head', array( $this, 'get_plugins' ) );
 			}
@@ -58,6 +61,7 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 
 			require_once( $this-> directory_path . 'inc/class-wds-wp-contributions-plugins.php' );
 			require_once( $this-> directory_path . 'inc/class-wds-wp-contributions-themes.php' );
+			require_once( $this-> directory_path . 'inc/class-wds-wp-contributions-plugin-widget.php' );
 
 		}
 
@@ -72,6 +76,15 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 		 * Deactivation hook for the plugin.
 		 */
 		public function deactivate() {
+
+		}
+
+		/**
+		 * Register our widgets to display plugins, author, themes, and more.
+		 */
+		function register_widgets() {
+
+			register_widget( 'WDS_WP_Contributions_Plugin_Widget' );
 
 		}
 
