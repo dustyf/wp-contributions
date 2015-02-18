@@ -32,13 +32,6 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 	protected $default_widget_title = '';
 
 	/**
-	 * Shortcode name for this widget
-	 *
-	 * @var string
-	 */
-	protected $shortcode = 'wds_widget';
-
-	/**
 	 * Contruct widget.
 	 */
 	public function __construct() {
@@ -55,7 +48,6 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 		add_action( 'save_post',    array( $this, 'flush_widget_cache' ) );
 		add_action( 'deleted_post', array( $this, 'flush_widget_cache' ) );
 		add_action( 'switch_theme', array( $this, 'flush_widget_cache' ) );
-		add_shortcode( $this->shortcode, array( __CLASS__, 'get_widget' ) );
 	}
 
 	/**
@@ -105,7 +97,7 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 				'text'          => '',
 			),
 			(array) $atts,
-			$this->shortcode
+			'wds_widget'
 		);
 		// Before widget hook
 		$widget .= $atts['before_widget'];
@@ -129,12 +121,8 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 		$instance = $old_instance;
 		// Sanitize title before saving to database
 		$instance['title'] = sanitize_text_field( $new_instance['title'] );
-		// Sanitize text before saving to database
-		if ( current_user_can( 'unfiltered_html' ) ) {
-			$instance['text'] = force_balance_tags( $new_instance['text'] );
-		} else {
-			$instance['text'] = stripslashes( wp_filter_post_kses( addslashes( $new_instance['text'] ) ) );
-		}
+		// Sanitize plugin slug before saving to database
+		$instance['plugin_slug'] = sanitize_text_field( $new_instance['plugin_slug'] );
 		// Flush cache
 		$this->flush_widget_cache();
 		return $instance;
@@ -150,19 +138,18 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 		$instance = wp_parse_args( (array) $instance,
 			array(
 				'title' => $this->default_widget_title,
-				'text'  => '',
+				'plugin_slug'  => '',
 			)
 		);
 		?>
 
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'wds-some-textdomain' ); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_html( $instance['title'] ); ?>" placeholder="optional" /></p>
+		<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'wp-contributions' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_html( $instance['title'] ); ?>" placeholder="optional" /></p>
 
-		<p><label for="<?php echo $this->get_field_id( 'text' ); ?>"><?php _e( 'Text:', 'wds-some-textdomain' ); ?></label>
-			<textarea class="widefat" rows="16" cols="20" id="<?php echo $this->get_field_id( 'text' ); ?>" name="<?php echo $this->get_field_name( 'text' ); ?>"><?php echo esc_textarea( $instance['text'] ); ?></textarea></p>
-		<p class="description"><?php _e( 'Basic HTML tags are allowed.', 'wds-some-textdomain' ); ?></p>
+		<p><label for="<?php echo esc_attr( $this->get_field_id( 'plugin_slug' ) ); ?>"><?php esc_html_e( 'Plugin Slug:', 'wp-contributions' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'plugin_slug' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'plugin_slug' ) ); ?>" type="text" value="<?php echo esc_html( $instance['plugin_slug'] ); ?>" /></p>
 
 	<?php
 	}
-	
+
 }
