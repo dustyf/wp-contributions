@@ -10,6 +10,10 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 
 		function __construct() {
 
+			global $wp_contributions;
+			$wp_contributions->is_query = true;
+			$wp_contributions->query->type = 'plugin';
+
 		}
 
 		/**
@@ -22,7 +26,11 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 		 * @param array|object $args   Optional. Arguments to serialize for the Plugin Info API.
 		 * @return object $res response object on success, WP_Error on failure.
 		 */
-		function plugins_api( $action, $args = null ) {
+		public function plugins_api( $action, $args = null ) {
+
+			global $wp_contributions;
+			$wp_contributions->query->action = esc_attr( $action );
+			$wp_contributions->query->args   = $args;
 
 			if ( is_array( $args ) ) {
 				$args = (object) $args;
@@ -73,6 +81,10 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 		 */
 		public function get_plugin( $plugin_slug ) {
 
+			global $wp_contributions;
+			$wp_contributions->query->method = 'by_slug';
+			$wp_contributions->query->plugin_slug = esc_attr( $plugin_slug );
+
 			if ( false === ( $plugin = get_transient( 'wp_contributions_plugin_' . $plugin_slug ) ) ) {
 				$args   = array(
 					'slug' => esc_attr( $plugin_slug ),
@@ -81,6 +93,7 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 				set_transient( 'wp_contributions_plugin_' . $plugin_slug, $plugin, 24 * HOUR_IN_SECONDS );
 			}
 
+			$wp_contributions->query->results = $plugin;
 			return $plugin;
 
 		}
@@ -93,6 +106,10 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 		 */
 		public function get_author_plugins( $author_name ) {
 
+			global $wp_contributions;
+			$wp_contributions->query->method = 'by_author';
+			$wp_contributions->query->author = $author_name;
+
 			if ( false === ( $author = get_transient( 'wp_contributions_plugin_author_' . $author_name ) ) ) {
 				$args   = array(
 					'author' => esc_attr( $author_name ),
@@ -101,6 +118,7 @@ if ( ! class_exists( 'WDS_WP_Contributions_Plugins' ) ) {
 				set_transient( 'wp_contributions_plugin_' . $author_name, $author, 24 * HOUR_IN_SECONDS );
 			}
 
+			$wp_contributions->query->results = $author;
 			return $author;
 
 		}
