@@ -26,6 +26,8 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 			$this->basename       = plugin_basename( __FILE__ );
 			$this->directory_path = plugin_dir_path( __FILE__ );
 			$this->directory_url  = plugins_url( dirname( $this->basename ) );
+			$this->is_query       = 'false';
+			$this->query          = new stdClass();
 
 			// Include any required files
 			$this->includes();
@@ -152,20 +154,21 @@ if ( ! class_exists( 'WDS_WP_Contributions' ) ) {
 		}
 
 		function get_plugins() {
-
+			global $wp_contributions;
 			$action = 'query_plugins';
 			$args = array(
 				'author' => 'dustyf',
 			);
 
-			$plugin_api = new WDS_WP_Contributions_Plugins();
+			$plugin_api = new WDS_WP_Contributions_Plugins($action, $args);
 			$plugins = $plugin_api->get_author_plugins('dustyf');
-			var_dump($plugins);
+			var_dump($wp_contributions);
 
 		}
 
 	}
 
-	$_GLOBALS['wp_contributions'] = new WDS_WP_Contributions();
+	global $wp_contributions;
+	$wp_contributions = new WDS_WP_Contributions();
 
 }
