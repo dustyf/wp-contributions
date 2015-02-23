@@ -72,8 +72,8 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 			'after_widget'  => $args['after_widget'],
 			'before_title'  => $args['before_title'],
 			'after_title'   => $args['after_title'],
-			'title'         => $instance['title'],
-			'text'          => $instance['text'],
+			'title'         => isset( $instance['title'] ) ? $instance['title'] : '',
+			'plugin_slug'   => isset( $instance['plugin_slug'] ) ? $instance['plugin_slug'] : '',
 		) );
 	}
 
@@ -84,29 +84,36 @@ class WDS_WP_Contributions_Plugin_Widget extends WP_Widget {
 	 * @return string       Widget output
 	 */
 	public static function get_widget( $atts ) {
+
 		$widget = '';
-		// Set up default values for attributes
-		$atts = shortcode_atts(
-			array(
-				// Ensure variables
-				'before_widget' => '',
-				'after_widget'  => '',
-				'before_title'  => '',
-				'after_title'   => '',
-				'title'         => '',
-				'text'          => '',
-			),
-			(array) $atts,
-			'wds_widget'
-		);
 		// Before widget hook
 		$widget .= $atts['before_widget'];
+
 		// Title
 		$widget .= ( $atts['title'] ) ? $atts['before_title'] . esc_html( $atts['title'] ) . $atts['after_title'] : '';
-		$widget .= wpautop( wp_kses_post( $atts['text'] ) );
+
+		$plugin_slug = isset( $atts['plugin_slug'] ) ? $atts['plugin_slug'] : '';
+		if ( ! $plugin_slug ) {
+			$widget .= '<p>' . esc_html__( 'No Plugin Slug Entered', 'wp-contributions' );
+		} else {
+
+			// Get the plugin using the WP.org API
+			$plugin_api  = new WDS_WP_Contributions_Plugins();
+			$plugin_data = $plugin_api->get_plugin( 'abcdeflnalenl' );
+
+			if ( ! is_wp_error( $plugin_data ) ) {
+				var_dump( $plugin_data );
+			} else {
+				$widget .= '<p>' . esc_html__( 'Plugin API failed. The plugin slug could be incorrect or there could be an error with the WP Plugin API.');
+			}
+
+		}
+
 		// After widget hook
 		$widget .= $atts['after_widget'];
+
 		return $widget;
+
 	}
 
 	/**
